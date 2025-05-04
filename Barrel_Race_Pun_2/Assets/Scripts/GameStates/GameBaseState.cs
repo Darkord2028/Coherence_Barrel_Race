@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class GameBaseState : GameState
 {
     protected UIManager uiManager;

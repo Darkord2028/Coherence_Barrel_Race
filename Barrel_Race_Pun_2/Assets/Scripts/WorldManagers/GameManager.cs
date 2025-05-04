@@ -4,16 +4,9 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
-    #region Temp Variables
-
-    [SerializeField] string entityID;
-
-    #endregion
-
     #region Game States
 
     public GameStateMachine StateMachine { get; private set; }
@@ -99,10 +92,45 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void CreateRoom()
     {
-        if (string.IsNullOrWhiteSpace(uiManager.roomNameText.text))
+        string roomName = uiManager.roomNameText.text.Trim();
+
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = uiManager.GetMaxPlayers();
+        roomOptions.IsVisible = true;
+        roomOptions.IsOpen = true;
+
+        if (string.IsNullOrEmpty(roomName))
         {
-            Debug.Log(uiManager.GetRoomName() + " string is Empty");
+            StartCoroutine(ShowMessage(1f, "Room Name is Empty!"));
         }
+        else
+        {
+            PhotonNetwork.CreateRoom(roomName, roomOptions);
+            uiManager.ToggleAllPanels(false);
+            uiManager.SetInfoPanel("Creating Room...");
+            uiManager.ToggleInfoPanel(true);
+        }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void UpdateRoomList(List<RoomInfo> roomList)
+    {
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            RoomInfo info = roomList[i];
+            if (info.RemovedFromList)
+            {
+                cachedRoomList.Remove(info.Name);
+            }
+            else
+            {
+                cachedRoomList[info.Name] = info;
+            }
+        }
+        uiManager.DisplayRoomList(cachedRoomList);
     }
 
     #endregion
@@ -156,7 +184,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public override void OnJoinedRoom()
     {
-        Debug.Log(PhotonNetwork.NickName + " Joined Room:- " + PhotonNetwork.CurrentRoom.ToString());
+        uiManager.ToggleInRoomPanel(false);
+        StartCoroutine(ShowMessage(1f, "Joined Room!"));
+    }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        UpdateRoomList(roomList);
     }
 
     #endregion

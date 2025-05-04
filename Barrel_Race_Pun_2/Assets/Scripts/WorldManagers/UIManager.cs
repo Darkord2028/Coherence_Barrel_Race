@@ -1,3 +1,6 @@
+using Photon.Pun;
+using Photon.Realtime;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,15 +13,21 @@ public class UIManager : MonoBehaviour
     [Header("Player UI")]
     [SerializeField] TextMeshProUGUI playerName;
 
+    [Header("Room UI")]
+    [SerializeField] GameObject roomItemPrefab;
+    [SerializeField] Transform roomParent;
+
     [Header("UI Panels")]
     [SerializeField] GameObject connectPanel;
     [SerializeField] GameObject nameInputPanel;
     [SerializeField] GameObject createJoinPanel;
+    [SerializeField] GameObject createRoomPanel;
     [SerializeField] GameObject roomPanel;
 
     [Header("TMPro References")]
     [SerializeField] TextMeshProUGUI infoText;
-    public TextMeshProUGUI roomNameText;
+    public TMP_InputField roomNameText;
+    [SerializeField] TextMeshProUGUI maxPlayersTmpro;
 
     [Header("Button References")]
     [SerializeField] Button reconnectButton;
@@ -39,8 +48,36 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         playerName.transform.parent.gameObject.SetActive(false);
+        maxPlayersTmpro.text = maxPlayers.ToString();
     }
 
+
+    #endregion
+
+    #region Public Methods
+
+    public void RefreshRoom()
+    {
+        PhotonNetwork.JoinLobby();
+    }
+
+    public void AddPlayers()
+    {
+        if (maxPlayers < 6)
+        {
+            maxPlayers++;
+        }
+        maxPlayersTmpro.text = maxPlayers.ToString();
+    }
+
+    public void SubtractPlayers()
+    {
+        if (maxPlayers > 1)
+        {
+            maxPlayers--;
+        }
+        maxPlayersTmpro.text = maxPlayers.ToString();
+    }
 
     #endregion
 
@@ -71,12 +108,18 @@ public class UIManager : MonoBehaviour
         roomPanel.SetActive(enable);
     }
 
+    public void ToggleCreateRoomPanel(bool enable)
+    {
+        createRoomPanel.SetActive(enable);
+    }
+
     public void ToggleAllPanels(bool enable)
     {
         connectPanel.SetActive(enable);
         roomPanel.SetActive(enable);
         nameInputPanel.SetActive(enable);
         createJoinPanel.SetActive(enable);
+        createRoomPanel.SetActive(enable);
     }
 
     #endregion
@@ -107,6 +150,21 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Set Methods
+
+    public void DisplayRoomList(Dictionary<string, RoomInfo> roomList)
+    {
+        foreach (Transform child in roomParent)
+        {
+            RoomItemUI.Destroy(child.gameObject);
+        }
+
+        //Display List
+        foreach (KeyValuePair<string, RoomInfo> roomInfo in roomList)
+        {
+            var item = Instantiate(roomItemPrefab.gameObject, roomParent);
+            item.GetComponent<RoomItemUI>().SetRoom(roomInfo.Value.Name, roomInfo.Value.MaxPlayers, roomInfo.Value.PlayerCount);
+        }
+    }
 
     #endregion
 
