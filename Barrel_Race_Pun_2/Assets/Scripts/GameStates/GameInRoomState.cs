@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class GameInRoomState : GameBaseState
 {
-    PlayerReadyItem[] playerReadyItems;
-
     public GameInRoomState(GameManager gameManager, GameStateMachine stateMachine, GameData gameData) : base(gameManager, stateMachine, gameData)
     {
     }
