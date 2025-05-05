@@ -1,3 +1,4 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ public class UIManager : MonoBehaviour
     [Header("Room UI")]
     [SerializeField] GameObject roomItemPrefab;
     [SerializeField] Transform roomParent;
+    [SerializeField] GameObject playerReadyPrefab;
+    [SerializeField] Transform playerReadyParent;
 
     [Header("UI Panels")]
     [SerializeField] GameObject connectPanel;
@@ -23,11 +26,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject createJoinPanel;
     [SerializeField] GameObject createRoomPanel;
     [SerializeField] GameObject roomPanel;
+    [SerializeField] GameObject playerReadyPanel;
 
     [Header("TMPro References")]
     [SerializeField] TextMeshProUGUI infoText;
     public TMP_InputField roomNameText;
-    [SerializeField] TextMeshProUGUI maxPlayersTmpro;
+    [SerializeField] TextMeshProUGUI maxPlayersText;
 
     [Header("Button References")]
     [SerializeField] Button reconnectButton;
@@ -48,7 +52,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         playerName.transform.parent.gameObject.SetActive(false);
-        maxPlayersTmpro.text = maxPlayers.ToString();
+        maxPlayersText.text = maxPlayers.ToString();
     }
 
 
@@ -67,7 +71,7 @@ public class UIManager : MonoBehaviour
         {
             maxPlayers++;
         }
-        maxPlayersTmpro.text = maxPlayers.ToString();
+        maxPlayersText.text = maxPlayers.ToString();
     }
 
     public void SubtractPlayers()
@@ -76,7 +80,7 @@ public class UIManager : MonoBehaviour
         {
             maxPlayers--;
         }
-        maxPlayersTmpro.text = maxPlayers.ToString();
+        maxPlayersText.text = maxPlayers.ToString();
     }
 
     #endregion
@@ -108,6 +112,16 @@ public class UIManager : MonoBehaviour
         roomPanel.SetActive(enable);
     }
 
+    public void TogglePlayerReadyPanel(bool enable)
+    {
+        playerReadyPanel.SetActive(enable);
+    }
+
+    public void SetText(TextMeshProUGUI textMeshPro, string message)
+    {
+        textMeshPro.text = message;
+    }
+
     public void ToggleCreateRoomPanel(bool enable)
     {
         createRoomPanel.SetActive(enable);
@@ -120,6 +134,7 @@ public class UIManager : MonoBehaviour
         nameInputPanel.SetActive(enable);
         createJoinPanel.SetActive(enable);
         createRoomPanel.SetActive(enable);
+        playerReadyPanel.SetActive(enable);
     }
 
     #endregion
@@ -173,6 +188,8 @@ public class UIManager : MonoBehaviour
     public string GetRoomName() { return roomNameText.text; }
     public int GetMaxPlayers() { return maxPlayers; }
     public Button GetCreateRoomButton() { return createRoomButton; }
+    public GameObject GetPlayerReadyPrefab() { return playerReadyPrefab; }
+    public Transform GetPlayerReadyParent() { return playerReadyParent; }
 
     #endregion
 

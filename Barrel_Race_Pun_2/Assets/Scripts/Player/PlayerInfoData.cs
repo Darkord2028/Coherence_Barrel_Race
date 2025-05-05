@@ -3,22 +3,28 @@ using UnityEngine;
 public class PlayerInfoData : MonoBehaviour
 {
     [SerializeField] string playerName;
-    [SerializeField] ushort playerID;
+    [SerializeField] int playerID;
     //Player Current Skin
     //Player Current Barrel Skin
 
     #region Set Functions
 
-    public void SetPlayerName(string name)
+    public void SetPlayer(string name, int id)
     {
         playerName = name;
-    }
-
-    public void SetPlayerId(ushort id)
-    {
         playerID = id;
     }
 
     #endregion
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public int GetPlayerID()
+    {
+        return playerID;
+    }
 
 }

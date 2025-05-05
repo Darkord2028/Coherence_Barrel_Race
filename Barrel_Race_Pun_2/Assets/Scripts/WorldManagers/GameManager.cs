@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameStateMachine StateMachine { get; private set; }
     public GameOfflineState OfflineState { get; private set; }
     public GameOnlineState OnlineState { get; private set; }
+    public GameInRoomState InRoomState { get; private set; }
 
     #endregion
 
@@ -25,18 +26,29 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     [SerializeField] GameData gameData;
 
+    [Header("Player Spawn Positions")]
+    [SerializeField] Transform[] spawnPositions;
+
     #endregion
 
     #region Public Get Variables
 
-    public Player localPlayer;
-    public Dictionary<ulong, Player> networkPlayers = new Dictionary<ulong, Player>();
+    
 
     #endregion
 
     #region Private Variables
 
     private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
+    private Dictionary<PhotonView, Player> networkPlayers = new Dictionary<PhotonView, Player>();
+
+    private Player localPlayer;
+    private List<PlayerInfoData> networkPlayersInfo = new List<PlayerInfoData>();
+    private List<PlayerReadyItem> networkPlayerReadyItem = new List<PlayerReadyItem>();
+
+    private int readyPlayerCount;
+
+    private bool isReady = false;
 
     #endregion
 
@@ -48,6 +60,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         OfflineState = new GameOfflineState(this, StateMachine, gameData);
         OnlineState = new GameOnlineState(this, StateMachine, gameData);
+        InRoomState = new GameInRoomState(this, StateMachine, gameData);
     }
 
     public override void OnEnable()
@@ -186,6 +199,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         uiManager.ToggleInRoomPanel(false);
         StartCoroutine(ShowMessage(1f, "Joined Room!"));
+        GameObject playerGO = PhotonNetwork.Instantiate(gameData.playerPrefab.name, GetPlayerSpawnTransform().position, GetPlayerSpawnTransform().rotation);
+        localPlayer = playerGO.GetComponent<Player>();
+        PhotonView view = playerGO.GetPhotonView();
+
+        photonView.RPC(nameof(SetPayerInfoRPC), RpcTarget.AllBuffered, view.ViewID);
+        photonView.RPC(nameof(SetPlayerReadyListRPC), RpcTarget.AllBuffered, view.ViewID);
+
+        StateMachine.ChangeState(InRoomState);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -199,14 +220,66 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public UIManager GetUIManager() { return uiManager; }
 
+    public Transform GetPlayerSpawnTransform()
+    {
+        return spawnPositions[PhotonNetwork.CurrentRoom.PlayerCount - 1];
+    }
+
+    public PlayerReadyItem GetPlayerReadyItem(int viewID)
+    {
+        foreach (PlayerReadyItem readyItem in networkPlayerReadyItem)
+        {
+            if (readyItem.GetViewID() == viewID)
+            {
+                return readyItem;
+            }
+        }
+
+        return null;
+    }
+
     #endregion
 
     #region Set Functions
 
-    public void SpawnPlayer(Vector3 position, Quaternion rotation)
+    public void SetPlayerReady()
     {
-        GameObject player = Instantiate(gameData.playerPrefab, position, rotation);
-        localPlayer = player.GetComponent<Player>();
+        isReady = !isReady;
+        object[] content = new object[] { networkPlayersInfo[0].GetPlayerID(), isReady };
+        PhotonNetwork.RaiseEvent(EventCode.readyButton, content, new RaiseEventOptions { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
+
+    #endregion
+
+    #region RPC Methods
+
+    [PunRPC]
+    public void SetPayerInfoRPC(int viewID)
+    {
+        PhotonView photonView = PhotonNetwork.GetPhotonView(viewID);
+        Player player = photonView.GetComponent<Player>();
+        PlayerInfoData infoData = player.gameObject.GetComponent<PlayerInfoData>();
+
+        networkPlayersInfo.Add(infoData);
+
+        if (infoData != null)
+        {
+            infoData.SetPlayer(photonView.Owner.NickName, viewID);
+        }
+
+        networkPlayers.Add(photonView, player);
+    }
+
+    [PunRPC]
+    private void SetPlayerReadyListRPC(int viewID)
+    {
+        GameObject instance = Instantiate(uiManager.GetPlayerReadyPrefab(), uiManager.GetPlayerReadyParent());
+        PlayerReadyItem readyItem = instance.GetComponent<PlayerReadyItem>();
+        networkPlayerReadyItem.Add(readyItem);
+        PhotonView photonView = PhotonNetwork.GetPhotonView(viewID);
+
+        readyItem.SetPlayer(photonView.Owner.NickName, photonView.ViewID);
+        readyItem.SetPlayerReady(false);
     }
 
     #endregion
@@ -215,8 +288,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void OnEvent(EventData photonEvent)
     {
+        if (photonEvent.Code == EventCode.readyButton)
+        {
+            object[] data = photonEvent.CustomData as object[];
+
+            if (data == null || data.Length < 2)
+            {
+                Debug.LogWarning("Received malformed readyButton event data.");
+                return;
+            }
+
+            int viewID = (int)data[0];
+            bool isReady = (bool)data[1];
+
+            PlayerReadyItem readyItem = GetPlayerReadyItem(viewID);
+            readyItem.SetPlayerReady(isReady);
+
+            if (isReady) { readyPlayerCount++; }
+            else { readyPlayerCount--; }
+
+            Debug.Log(readyPlayerCount);
+        }
     }
 
     #endregion
 
+}
+
+public static class EventCode
+{
+    public const byte readyButton = 1;
 }
