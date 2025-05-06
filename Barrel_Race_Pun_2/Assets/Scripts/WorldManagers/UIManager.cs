@@ -27,11 +27,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject createRoomPanel;
     [SerializeField] GameObject roomPanel;
     [SerializeField] GameObject playerReadyPanel;
+    [SerializeField] GameObject timerPanel;
 
     [Header("TMPro References")]
     [SerializeField] TextMeshProUGUI infoText;
     public TMP_InputField roomNameText;
     [SerializeField] TextMeshProUGUI maxPlayersText;
+    [SerializeField] TextMeshProUGUI timerText;
 
     [Header("Button References")]
     [SerializeField] Button reconnectButton;
@@ -48,6 +50,16 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Unity Callback Methods
+
+    private void OnEnable()
+    {
+        ToggleAllPanels(false);
+    }
+
+    private void OnDisable()
+    {
+        ToggleAllPanels(false);
+    }
 
     private void Start()
     {
@@ -97,11 +109,6 @@ public class UIManager : MonoBehaviour
         connectPanel.SetActive(enable);
     }
 
-    public void SetInfoPanel(string infoMessage)
-    {
-        infoText.text = infoMessage;
-    }
-
     public void ToggleCreateJoinPanel(bool enable)
     {
         createJoinPanel.SetActive(enable);
@@ -117,14 +124,14 @@ public class UIManager : MonoBehaviour
         playerReadyPanel.SetActive(enable);
     }
 
-    public void SetText(TextMeshProUGUI textMeshPro, string message)
-    {
-        textMeshPro.text = message;
-    }
-
     public void ToggleCreateRoomPanel(bool enable)
     {
         createRoomPanel.SetActive(enable);
+    }
+
+    public void ToggleTimerPanel(bool enable)
+    {
+        timerPanel.SetActive(enable);
     }
 
     public void ToggleAllPanels(bool enable)
@@ -135,6 +142,7 @@ public class UIManager : MonoBehaviour
         createJoinPanel.SetActive(enable);
         createRoomPanel.SetActive(enable);
         playerReadyPanel.SetActive(enable);
+        timerPanel.SetActive(enable);
     }
 
     #endregion
@@ -179,6 +187,21 @@ public class UIManager : MonoBehaviour
             var item = Instantiate(roomItemPrefab.gameObject, roomParent);
             item.GetComponent<RoomItemUI>().SetRoom(roomInfo.Value.Name, roomInfo.Value.MaxPlayers, roomInfo.Value.PlayerCount);
         }
+    }
+
+    public void SetTimer(string timerMessage)
+    {
+        timerText.text = timerMessage;
+    }
+
+    public void SetText(TextMeshProUGUI textMeshPro, string message)
+    {
+        textMeshPro.text = message;
+    }
+
+    public void SetInfoPanel(string infoMessage)
+    {
+        infoText.text = infoMessage;
     }
 
     #endregion

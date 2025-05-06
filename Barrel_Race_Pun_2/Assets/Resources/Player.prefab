@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 7638995636890222841}
   - component: {fileID: 5537171869677252302}
+  - component: {fileID: -8033558590840482633}
   - component: {fileID: 271871426826626838}
   - component: {fileID: 4563121495531842664}
   - component: {fileID: 5510753299059004067}
   - component: {fileID: 574285852144534987}
   - component: {fileID: 5691648081573287347}
-  - component: {fileID: 7744688942488680190}
   - component: {fileID: 6872183329716821593}
   m_Layer: 0
   m_Name: Player
@@ -62,6 +62,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!143 &-8033558590840482633
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3980979275777134011}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 3
+  m_Radius: 0.7
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &271871426826626838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,8 +158,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugAnimationBoolName: 0
+  animBoolName: 
   animator: {fileID: 5537171869677252302}
   playerData: {fileID: 11400000, guid: 1c8a776d74e8577469e16a87141c68ef, type: 2}
+  characterController: {fileID: -8033558590840482633}
 --- !u!114 &574285852144534987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,24 +195,11 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 5510753299059004067}
   - {fileID: 6872183329716821593}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &7744688942488680190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3980979275777134011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54812951e0422ea4d9d7d8e1fd5963a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementSpeed: 10
-  rotationSpeed: 8
 --- !u!114 &6872183329716821593
 MonoBehaviour:
   m_ObjectHideFlags: 0

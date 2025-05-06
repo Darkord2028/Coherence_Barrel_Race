@@ -307,7 +307,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (isReady) { readyPlayerCount++; }
             else { readyPlayerCount--; }
 
-            Debug.Log(readyPlayerCount);
+            if (readyPlayerCount == PhotonNetwork.CurrentRoom.PlayerCount) { InRoomState.StartTimer(); }
+            else { InRoomState.StopTimer(); }
         }
     }
 

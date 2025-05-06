@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class PlayerIdleState : PlayerGroundedState
+public class PlayerNetworkState : PlayerState
 {
-    public PlayerIdleState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerNetworkState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -34,9 +34,6 @@ public class PlayerIdleState : PlayerGroundedState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
-
-        player.HandleForwardMovement();
-        player.HandleConstrainedTurning();
     }
 
     public override void PhysicsUpdate()

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class PlayerIdleState : PlayerGroundedState
+public class PlayerMoveState : PlayerGroundedState
 {
-    public PlayerIdleState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerMoveState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -35,8 +35,7 @@ public class PlayerIdleState : PlayerGroundedState
     {
         base.LogicUpdate();
 
-        player.HandleForwardMovement();
-        player.HandleConstrainedTurning();
+        player.SetMovement(playerData.movementSpeed);
     }
 
     public override void PhysicsUpdate()

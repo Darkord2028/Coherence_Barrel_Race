@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: BaseGameData
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 3980979275777134011, guid: 4951ce854f2229d449f3189049c5d27a, type: 3}
+  countdownDuration: 10

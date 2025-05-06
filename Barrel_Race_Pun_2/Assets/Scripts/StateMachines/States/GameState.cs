@@ -14,7 +14,7 @@ public class GameState
     {
         this.gameManager = gameManager;
         StateMachine = stateMachine;
-        this.gameManager = gameManager;
+        this.gameData = gameData;
     }
 
     public virtual void Enter()

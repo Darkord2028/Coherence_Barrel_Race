@@ -1,3 +1,5 @@
+using Photon.Pun;
+using System.Collections;
 using UnityEngine;
 
 public class GameInRoomState : GameBaseState
@@ -30,6 +32,35 @@ public class GameInRoomState : GameBaseState
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+    }
+
+    public void StartTimer()
+    {
+        gameManager.StartCoroutine(CountdownCoroutine());
+    }
+
+    public void StopTimer()
+    {
+        uiManager.ToggleTimerPanel(false);
+        gameManager.StopCoroutine(CountdownCoroutine());
+    }
+
+    private IEnumerator CountdownCoroutine()
+    {
+        float timeLeft = gameData.countdownDuration;
+        string timeText = "";
+        uiManager.ToggleTimerPanel(true);
+
+        while (timeLeft > 0)
+        {
+            timeLeft -= Time.deltaTime;
+            timeText = Mathf.Ceil(timeLeft).ToString();
+            uiManager.SetTimer(timeText);
+            yield return null;
+        }
+
+        // Trigger your game logic here
+        uiManager.ToggleAllPanels(false);
     }
 
 }
