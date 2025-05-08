@@ -6,10 +6,28 @@
             "id": "061124a9-7e6e-4ca8-921a-8b9bb859ceca",
             "actions": [
                 {
-                    "name": "Movement",
+                    "name": "Steer",
                     "type": "PassThrough",
                     "id": "4c623771-c7ba-4636-a192-ff9c99cb2870",
                     "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Accelerate",
+                    "type": "Button",
+                    "id": "391c4c47-1c73-4f96-9453-965ce8c7d6a1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Drift",
+                    "type": "Button",
+                    "id": "5d4b2c66-393e-42f9-8ad3-74cea1fdc0ef",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -23,7 +41,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -34,7 +52,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -45,7 +63,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -56,7 +74,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -67,7 +85,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -78,7 +96,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -89,7 +107,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -100,7 +118,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -111,7 +129,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -122,9 +140,31 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movement",
+                    "action": "Steer",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b9a870d6-c1a8-450d-9630-7fc597834cd4",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drift",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e9b35fb4-949c-4da3-a0a9-f8e5c49fdad8",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Accelerate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
