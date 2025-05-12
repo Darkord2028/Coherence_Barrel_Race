@@ -1,8 +1,10 @@
 using UnityEngine;
 
-public class PlayerClientState : PlayerNetworkState
+public class PlayerInAirState : PlayerState
 {
-    public PlayerClientState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    private bool isGrounded;
+
+    public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -19,6 +21,7 @@ public class PlayerClientState : PlayerNetworkState
     public override void DoChecks()
     {
         base.DoChecks();
+        isGrounded = player.CheckIfGrounded();
     }
 
     public override void Enter()
@@ -34,6 +37,10 @@ public class PlayerClientState : PlayerNetworkState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+        if (isGrounded)
+        {
+            StateMachine.ChangeState(player.IdleState);
+        }
     }
 
     public override void PhysicsUpdate()

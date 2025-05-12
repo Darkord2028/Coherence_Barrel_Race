@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class PlayerMoveState : PlayerGroundedState
+public class PlayerAccelerateState : PlayerGroundedState
 {
-    public PlayerMoveState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerAccelerateState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -34,12 +34,12 @@ public class PlayerMoveState : PlayerGroundedState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
-
-        player.SetMovement(playerData.movementSpeed);
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+
+        player.RB.linearVelocity = player.transform.forward * playerData.acceleration;
     }
 }

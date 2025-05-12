@@ -1,16 +1,16 @@
 using Cinemachine;
 using Photon.Pun;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.XR;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviourPun, IPunObservable
 {
     #region State Variables
 
     public PlayerIdleState IdleState { get; private set; }
-    public PlayerClientState ClientState { get; private set; }
+    public PlayerAccelerateState AccelerateState { get; private set; }
+    public PlayerDecelerateState DecelerateState { get; private set; }
+    public PlayerInAirState InAirState { get; private set; }
 
     #endregion
 
@@ -18,17 +18,15 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     public bool debugAnimationBoolName;
     public string animBoolName;
+    public bool isGrounded;
 
     #endregion
 
     #region Private Variables
 
     private CinemachineVirtualCamera playerCamera;
-    private Transform playerCameraTransform;
 
-    private Vector3 moveDirection;
-    private Quaternion targetRotation;
-    private float currentYaw = 0f;
+    private Collider[] hitColliders = new Collider[3];
 
     #endregion
 
@@ -40,9 +38,12 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     #region Component and Data References
 
-    [SerializeField] Animator animator;
     [SerializeField] PlayerData playerData;
-    [SerializeField] CharacterController characterController;
+    [SerializeField] Transform groundCheckTransform;
+
+    public Animator animator { get; private set; }
+    public Rigidbody RB { get; private set; }
+    public Collider playerCollider { get; private set; }
 
     #endregion
 
@@ -59,9 +60,14 @@ public class Player : MonoBehaviourPun, IPunObservable
     {
         StateMachine = new PlayerStateMachine();
         InputManager = GetComponent<PlayerInputManager>();
+        RB = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+        playerCollider = GetComponent<Collider>();
 
         IdleState = new PlayerIdleState(this, StateMachine, playerData, "idle");
-        ClientState = new PlayerClientState(this, StateMachine, playerData, "client");
+        AccelerateState = new PlayerAccelerateState(this, StateMachine, playerData, "accelerate");
+        DecelerateState = new PlayerDecelerateState(this, StateMachine, playerData, "decelerate");
+        InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
     }
 
     private void Start()
@@ -71,13 +77,20 @@ public class Player : MonoBehaviourPun, IPunObservable
 
         if (photonView.IsMine)
         {
-            SetCustomCamera();
+            SetPlayerCamera();
+        }
+        else if (!photonView.IsMine)
+        {
+            PlayerInput playerInput = GetComponent<PlayerInput>();
+            playerInput.enabled = false;
+            SetClient();
         }
     }
 
     private void Update()
     {
         StateMachine.CurrentState.LogicUpdate();
+        isGrounded = CheckIfGrounded();
     }
 
     private void FixedUpdate()
@@ -89,81 +102,18 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     #region Set Methods
 
-    public void HandleForwardMovement()
-    {
-        moveDirection = transform.forward * playerData.movementSpeed;
-        moveDirection.y -= playerData.gravity * Time.deltaTime;
-        characterController.Move(moveDirection * Time.deltaTime);
-
-        // Smooth turning toward currentYaw
-        Quaternion desiredRotation = Quaternion.Euler(0f, currentYaw, 0f);
-        transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, Time.deltaTime * playerData.turnSpeed);
-    }
-
-    public void HandleConstrainedTurning()
-    {
-        float inputX = InputManager.MovementInput.x;
-
-        // Only turn if input is held and significant
-        if (Mathf.Abs(inputX) > 0.1f)
-        {
-            float deltaYaw = inputX * playerData.turnAngle * Time.deltaTime;
-            float newYaw = currentYaw + deltaYaw;
-
-            // Clamp the new yaw within limits
-            newYaw = Mathf.Clamp(newYaw, -playerData.maxTurnLimit, playerData.maxTurnLimit);
-
-            currentYaw = newYaw;
-        }
-    }
-
     public void SetPlayerCamera()
     {
-        GameObject instance = Instantiate(playerData.playerCinmachineCameraPrefab, Vector3.zero, Quaternion.identity);
-        playerCamera = instance.GetComponentInChildren<CinemachineVirtualCamera>();
-        playerCamera.Follow = transform;
-        playerCamera.LookAt = transform;
-        playerCameraTransform = instance.transform;
+        playerCamera = Instantiate(playerData.playerCinmachineCameraPrefab);
+
+        playerCamera.m_Follow = transform;
+        playerCamera.m_LookAt = transform;
     }
 
-    public void SetCustomCamera()
+    public void SetClient()
     {
-        CameraController cameraController = Camera.main.GetComponent<CameraController>();
-        cameraController.SetTarget(transform);
-    }
-
-    public void SetMovement(float movementSpeed)
-    {
-        if (playerCameraTransform == null) return;
-
-        Vector3 moveDirection;
-        moveDirection = playerCameraTransform.forward * InputManager.MovementInput.y;
-        moveDirection = moveDirection + playerCameraTransform.right * InputManager.MovementInput.x;
-        moveDirection.Normalize();
-        moveDirection = moveDirection * movementSpeed;
-
-        Vector3 movementVelocity = moveDirection;
-        characterController.Move(movementVelocity * Time.deltaTime);
-    }
-
-    public void SetRotation(float rotationSpeed)
-    {
-        if (playerCameraTransform == null) return;
-
-        Vector3 targetDirection = Vector3.zero;
-        targetDirection = playerCameraTransform.forward * InputManager.MovementInput.y;
-        targetDirection = targetDirection + playerCameraTransform.right * InputManager.MovementInput.x;
-        targetDirection.Normalize();
-        targetDirection.y = 0;
-
-        if (targetDirection == Vector3.zero)
-        {
-            targetDirection = transform.forward;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-        Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        transform.rotation = playerRotation;
+        RB.isKinematic = true;
+        playerCollider.enabled = false;
     }
 
     #endregion
@@ -171,6 +121,27 @@ public class Player : MonoBehaviourPun, IPunObservable
     #region Get Methods
 
     public Animator GetAnimator() { return animator; }
+
+    #endregion
+
+    #region Event Methods
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out Obstacles obstacle))
+        {
+            //StateMachine.ChangeState();
+        }
+    }
+
+    #endregion
+
+    #region Check Methods
+
+    public bool CheckIfGrounded()
+    {
+        return Physics.Raycast(groundCheckTransform.position, -groundCheckTransform.up, playerData.groundCheckDistance, playerData.whatIsGround);
+    }
 
     #endregion
 
@@ -187,6 +158,16 @@ public class Player : MonoBehaviourPun, IPunObservable
             networkAnimBoolName = (string)stream.ReceiveNext();
         }
         
+    }
+
+    #endregion
+
+    #region Gizmos
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(groundCheckTransform.position, -groundCheckTransform.up * playerData.groundCheckDistance);
     }
 
     #endregion

@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e552c399d64a9b14c869e407f8e9795a, type: 3}
   m_Name: BasePlayerData
   m_EditorClassIdentifier: 
-  playerCinmachineCameraPrefab: {fileID: 0}
-  movementSpeed: 0.1
-  rotationSpeed: 10
-  gravity: 0
-  turnAngle: 45
-  turnSpeed: 5
-  turnCooldown: 0.5
-  maxTurnLimit: 90
+  playerCinmachineCameraPrefab: {fileID: 1261963491999726358, guid: cc1417871f120d94fb4086a6e3c0e76a, type: 3}
+  acceleration: 15
+  deceleration: 0
+  turnSpeed: 30
+  groundCheckDistance: 0.2
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 65

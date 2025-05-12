@@ -36,6 +36,7 @@ public class GameInRoomState : GameBaseState
 
     public void StartTimer()
     {
+        uiManager.TogglePlayerReadyPanel(false);
         gameManager.StartCoroutine(CountdownCoroutine());
     }
 

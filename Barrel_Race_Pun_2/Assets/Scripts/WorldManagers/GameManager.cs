@@ -179,8 +179,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        uiManager.ToggleAllPanels(false);
-        uiManager.SetReconnectButton(true);
+        if (Application.isPlaying)
+        {
+            uiManager.ToggleAllPanels(false);
+            uiManager.SetReconnectButton(true);
+        }
     }
 
     public override void OnJoinedLobby()
@@ -308,7 +311,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
             else { readyPlayerCount--; }
 
             if (readyPlayerCount == PhotonNetwork.CurrentRoom.PlayerCount) { InRoomState.StartTimer(); }
-            else { InRoomState.StopTimer(); }
         }
     }
 
