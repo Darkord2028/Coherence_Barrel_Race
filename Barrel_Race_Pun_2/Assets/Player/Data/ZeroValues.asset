@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e552c399d64a9b14c869e407f8e9795a, type: 3}
-  m_Name: BasePlayerData
+  m_Name: ZeroValues
   m_EditorClassIdentifier: 
   playerCinmachineCameraPrefab: {fileID: 1261963491999726358, guid: cc1417871f120d94fb4086a6e3c0e76a, type: 3}
-  acceleration: 15
+  acceleration: 0
   deceleration: 0
-  turnSpeed: 30
-  boostSpeed: 15
+  turnSpeed: 0
+  boostSpeed: 0
   boostSpeedTime: 0
-  mudSpeed: 20
-  mudSpeedTime: 3
+  mudSpeed: 0
+  mudSpeedTime: 0
   groundCheckDistance: 0.2
   whatIsGround:
     serializedVersion: 2

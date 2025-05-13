@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class PlayerInAirState : PlayerState
+public class PlayerBoostState : PlayerGroundedState
 {
-    private bool isGrounded;
-
-    public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerBoostState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
-        this.playerState = E_PlayerState.INAIR;
 
+        this.playerState = E_PlayerState.BOOST;
     }
 
     public override void AnimationFinishTrigger()
@@ -23,7 +21,6 @@ public class PlayerInAirState : PlayerState
     public override void DoChecks()
     {
         base.DoChecks();
-        isGrounded = player.CheckIfGrounded();
     }
 
     public override void Enter()
@@ -39,10 +36,6 @@ public class PlayerInAirState : PlayerState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
-        if (isGrounded)
-        {
-            StateMachine.ChangeState(player.IdleState);
-        }
     }
 
     public override void PhysicsUpdate()

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public GameStateMachine StateMachine { get; private set; }
     public GameOfflineState OfflineState { get; private set; }
-    public GameOnlineState OnlineState { get; private set; }
+    public GameLobbyState OnlineState { get; private set; }
     public GameInRoomState InRoomState { get; private set; }
 
     #endregion
@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
     private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
     private Dictionary<PhotonView, Player> networkPlayers = new Dictionary<PhotonView, Player>();
 
-    private Player localPlayer;
+    public Player localPlayer;
     private List<PlayerInfoData> networkPlayersInfo = new List<PlayerInfoData>();
     private List<PlayerReadyItem> networkPlayerReadyItem = new List<PlayerReadyItem>();
 
@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
         StateMachine = new GameStateMachine();
 
         OfflineState = new GameOfflineState(this, StateMachine, gameData);
-        OnlineState = new GameOnlineState(this, StateMachine, gameData);
+        OnlineState = new GameLobbyState(this, StateMachine, gameData);
         InRoomState = new GameInRoomState(this, StateMachine, gameData);
     }
 
@@ -166,8 +166,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public override void OnConnected()
     {
-        uiManager.ToggleAllPanels(false);
-        uiManager.SetReconnectButton(false);
         OfflineState.SetIsConnected(true);
     }
 
@@ -202,8 +200,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         uiManager.ToggleInRoomPanel(false);
         StartCoroutine(ShowMessage(1f, "Joined Room!"));
+
         GameObject playerGO = PhotonNetwork.Instantiate(gameData.playerPrefab.name, GetPlayerSpawnTransform().position, GetPlayerSpawnTransform().rotation);
+        Vector3 spawnPosition = playerGO.transform.position;
         localPlayer = playerGO.GetComponent<Player>();
+        localPlayer.SetSpawnPosition(spawnPosition);
+
         PhotonView view = playerGO.GetPhotonView();
 
         photonView.RPC(nameof(SetPayerInfoRPC), RpcTarget.AllBuffered, view.ViewID);

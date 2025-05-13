@@ -32,6 +32,8 @@ public class GameOfflineState : GameBaseState
 
         if (isConnected)
         {
+            uiManager.ToggleAllPanels(false);
+            uiManager.SetReconnectButton(false);
             StateMachine.ChangeState(gameManager.OnlineState);
         }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 
 public class PlayerInputManager : MonoBehaviour
 {
@@ -75,6 +76,14 @@ public class PlayerInputManager : MonoBehaviour
         else
         {
             MovementInput = Vector2.zero;
+        }
+    }
+
+    public void OnDoubleTap(InputAction.CallbackContext context)
+    {
+        if (context.interaction is MultiTapInteraction && context.performed)
+        {
+            Debug.Log("Double Tap Detected via Interaction!");
         }
     }
 

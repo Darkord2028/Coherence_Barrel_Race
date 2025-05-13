@@ -48,17 +48,18 @@ public class PlayerGroundedState : PlayerState
 
         HandleTurning();
 
+
         if (isGrounded)
         {
-            if (!AccelerateInput && player.RB.linearVelocity.magnitude < 0.1f && !isExitingState)
+            if (!AccelerateInput && player.RB.linearVelocity.magnitude < 0.1f && !isExitingState && StateMachine.CurrentState.playerState!=E_PlayerState.IDLE)
             {
                 StateMachine.ChangeState(player.IdleState);
             }
-            else if (AccelerateInput && !isExitingState)
+            else if (AccelerateInput && !isExitingState && StateMachine.CurrentState.playerState != E_PlayerState.ACCELERATION)
             {
                 StateMachine.ChangeState(player.AccelerateState);
             }
-            else if (!AccelerateInput && player.RB.linearVelocity.magnitude > 0.1f && !isExitingState)
+            else if (!AccelerateInput && player.RB.linearVelocity.magnitude > 0.1f && !isExitingState && StateMachine.CurrentState.playerState != E_PlayerState.DECELERATION)
             {
                 StateMachine.ChangeState(player.DecelerateState);
             }

@@ -13,6 +13,8 @@ public class PlayerState
 
     public string AnimBoolName;
 
+    public E_PlayerState playerState;
+
     public PlayerState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName)
     {
         this.player = player;
@@ -27,8 +29,8 @@ public class PlayerState
         startTime = Time.time;
         player.GetAnimator().SetBool(AnimBoolName.ToString(), true);
         isExitingState = false;
-        if (player.debugAnimationBoolName) { Debug.Log(AnimBoolName); }
         isAnimationFinished = false;
+        player.OnStateUpdate((byte)playerState);
     }
 
     public virtual void Exit()
@@ -46,4 +48,13 @@ public class PlayerState
     public virtual void AnimationTrigger() { }
 
     public virtual void AnimationFinishTrigger() => isAnimationFinished = true;
+}
+
+public enum E_PlayerState
+{
+    IDLE,
+    ACCELERATION,
+    DECELERATION,
+    BOOST,
+    INAIR
 }

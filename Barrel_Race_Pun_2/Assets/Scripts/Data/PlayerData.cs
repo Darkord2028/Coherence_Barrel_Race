@@ -12,6 +12,14 @@ public class PlayerData : ScriptableObject
     public float deceleration;
     public float turnSpeed;
 
+    [Header("Boost Config")]
+    public float boostSpeed;
+    public float boostSpeedTime;
+
+    [Header("Mud Config")]
+    public float mudSpeed;
+    public float mudSpeedTime;
+
     [Header("Check Config")]
     public float groundCheckDistance;
     public LayerMask whatIsGround;

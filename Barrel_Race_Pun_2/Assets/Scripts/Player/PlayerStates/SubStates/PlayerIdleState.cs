@@ -4,6 +4,7 @@ public class PlayerIdleState : PlayerGroundedState
 {
     public PlayerIdleState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
+        this.playerState = E_PlayerState.IDLE;
     }
 
     public override void AnimationFinishTrigger()
@@ -40,4 +41,7 @@ public class PlayerIdleState : PlayerGroundedState
     {
         base.PhysicsUpdate();
     }
+
+
+  
 }

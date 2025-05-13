@@ -6520,6 +6520,7 @@ MonoBehaviour:
   - {fileID: 1799784933}
   - {fileID: 1701555864}
   - {fileID: 1208033867}
+  localPlayer: {fileID: 0}
 --- !u!114 &1579870705
 MonoBehaviour:
   m_ObjectHideFlags: 0

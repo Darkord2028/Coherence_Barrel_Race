@@ -4,6 +4,7 @@ public class PlayerDecelerateState : PlayerGroundedState
 {
     public PlayerDecelerateState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
+        this.playerState = E_PlayerState.DECELERATION;
     }
 
     public override void AnimationFinishTrigger()

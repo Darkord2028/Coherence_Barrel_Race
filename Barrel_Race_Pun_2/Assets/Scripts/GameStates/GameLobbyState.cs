@@ -1,6 +1,6 @@
-public class GameOnlineState : GameBaseState
+public class GameLobbyState : GameBaseState
 {
-    public GameOnlineState(GameManager gameManager, GameStateMachine stateMachine, GameData gameData) : base(gameManager, stateMachine, gameData)
+    public GameLobbyState(GameManager gameManager, GameStateMachine stateMachine, GameData gameData) : base(gameManager, stateMachine, gameData)
     {
     }
 

@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameInRoomState : GameBaseState
 {
@@ -62,6 +63,7 @@ public class GameInRoomState : GameBaseState
 
         // Trigger your game logic here
         uiManager.ToggleAllPanels(false);
+        gameManager.localPlayer.GetComponent<PlayerInput>().enabled = true;
     }
 
 }

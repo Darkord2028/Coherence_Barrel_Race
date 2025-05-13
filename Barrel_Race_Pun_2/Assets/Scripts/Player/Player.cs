@@ -1,5 +1,6 @@
 using Cinemachine;
 using Photon.Pun;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,28 +12,27 @@ public class Player : MonoBehaviourPun, IPunObservable
     public PlayerAccelerateState AccelerateState { get; private set; }
     public PlayerDecelerateState DecelerateState { get; private set; }
     public PlayerInAirState InAirState { get; private set; }
+    private Dictionary<E_PlayerState, PlayerState> StateEnumMap = new();
 
-    #endregion
+#endregion
 
-    #region Public Variables
+    #region Inspector Variabes
 
-    public bool debugAnimationBoolName;
-    public string animBoolName;
-    public bool isGrounded;
+    [SerializeField] bool debugAnimationBoolName;
+    [SerializeField] string _currentState;
 
     #endregion
 
     #region Private Variables
 
     private CinemachineVirtualCamera playerCamera;
-
-    private Collider[] hitColliders = new Collider[3];
+    private PlayerState currentState;
 
     #endregion
 
     #region Network Variables
 
-    private string networkAnimBoolName;
+    private PlayerState networkState;
 
     #endregion
 
@@ -44,6 +44,7 @@ public class Player : MonoBehaviourPun, IPunObservable
     public Animator animator { get; private set; }
     public Rigidbody RB { get; private set; }
     public Collider playerCollider { get; private set; }
+    public Vector3 spawnPosition { get; private set; }
 
     #endregion
 
@@ -68,6 +69,13 @@ public class Player : MonoBehaviourPun, IPunObservable
         AccelerateState = new PlayerAccelerateState(this, StateMachine, playerData, "accelerate");
         DecelerateState = new PlayerDecelerateState(this, StateMachine, playerData, "decelerate");
         InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
+
+        //TBD --> should be cleaned afterwards
+        StateEnumMap.Add(E_PlayerState.IDLE, IdleState);
+        StateEnumMap.Add(E_PlayerState.ACCELERATION, AccelerateState);
+        StateEnumMap.Add(E_PlayerState.DECELERATION, DecelerateState);
+        StateEnumMap.Add(E_PlayerState.INAIR, InAirState);
+
     }
 
     private void Start()
@@ -81,26 +89,37 @@ public class Player : MonoBehaviourPun, IPunObservable
         }
         else if (!photonView.IsMine)
         {
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            playerInput.enabled = false;
             SetClient();
         }
     }
 
     private void Update()
     {
+        if(photonView.IsMine){
         StateMachine.CurrentState.LogicUpdate();
-        isGrounded = CheckIfGrounded();
+            _currentState = StateMachine.CurrentState.AnimBoolName;
+        }
     }
 
     private void FixedUpdate()
     {
-        StateMachine.CurrentState.PhysicsUpdate();
+        if(photonView.IsMine)
+           { StateMachine.CurrentState.PhysicsUpdate(); }
     }
 
     #endregion
 
     #region Set Methods
+
+    public void OnStateUpdate(byte state)
+    {
+        if(photonView.IsMine)photonView.RPC(nameof(StateUpdateRPC), RpcTarget.Others, state);
+    }
+
+    public void SetSpawnPosition(Vector3 position)
+    {
+        spawnPosition = position;
+    }
 
     public void SetPlayerCamera()
     {
@@ -128,9 +147,38 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out Obstacles obstacle))
+        if (other.TryGetComponent(out Interactable interactable))
         {
-            //StateMachine.ChangeState();
+            if (interactable.interactableType == InteractableTypes.Nitro)
+            {
+                AccelerateState.SetBoost();
+            }
+            switch (interactable.interactableType)
+            {
+                case InteractableTypes.Nitro:
+                    AccelerateState.SetBoost();
+                    break;
+
+                case InteractableTypes.Mud:
+                    AccelerateState.SetMudSpeed();
+                    break;
+
+                case InteractableTypes.Wall:
+                    if (spawnPosition != Vector3.zero)
+                    {
+                        transform.position = spawnPosition;
+                    }
+                    else { transform.position = Vector3.zero; }
+                    break;
+
+                case InteractableTypes.Ink:
+                    // Ink Spots on the canvas
+                    break;
+
+                case InteractableTypes.Checkpoint:
+                    spawnPosition = other.transform.position;
+                    break;
+            }
         }
     }
 
@@ -148,16 +196,11 @@ public class Player : MonoBehaviourPun, IPunObservable
     #region Photon Serializable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
+    {   
         if (stream.IsWriting)
         {
-            stream.SendNext(animBoolName);
+            
         }
-        else
-        {
-            networkAnimBoolName = (string)stream.ReceiveNext();
-        }
-        
     }
 
     #endregion
@@ -168,6 +211,17 @@ public class Player : MonoBehaviourPun, IPunObservable
     {
         Gizmos.color = Color.green;
         Gizmos.DrawRay(groundCheckTransform.position, -groundCheckTransform.up * playerData.groundCheckDistance);
+    }
+
+    #endregion
+
+    #region PUN RPC's
+
+    [PunRPC]
+    private void StateUpdateRPC(byte state)
+    {
+        E_PlayerState _state = (E_PlayerState)state;
+        StateMachine.ChangeState(StateEnumMap[_state]);
     }
 
     #endregion
