@@ -4,6 +4,7 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
@@ -205,6 +206,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
         Vector3 spawnPosition = playerGO.transform.position;
         localPlayer = playerGO.GetComponent<Player>();
         localPlayer.SetSpawnPosition(spawnPosition);
+        localPlayer.GetComponent<PlayerInput>().enabled = false;
 
         PhotonView view = playerGO.GetPhotonView();
 

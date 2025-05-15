@@ -39,6 +39,7 @@ public class PlayerAccelerateState : PlayerGroundedState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+        player.HandleTurning();
     }
 
     public override void PhysicsUpdate()

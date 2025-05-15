@@ -190,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343342b914c87a84dab1fb8c3572863c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swipeThreshold: 5
+  swipeThreshold: 10
 --- !u!114 &5510753299059004067
 MonoBehaviour:
   m_ObjectHideFlags: 0

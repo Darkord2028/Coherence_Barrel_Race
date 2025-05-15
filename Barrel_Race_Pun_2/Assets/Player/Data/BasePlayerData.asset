@@ -15,9 +15,9 @@ MonoBehaviour:
   playerCinmachineCameraPrefab: {fileID: 1261963491999726358, guid: cc1417871f120d94fb4086a6e3c0e76a, type: 3}
   acceleration: 15
   deceleration: 0
-  turnSpeed: 30
-  boostSpeed: 15
-  boostSpeedTime: 0
+  turnSpeed: 15
+  boostSpeed: 10
+  boostSpeedTime: 3
   mudSpeed: 20
   mudSpeedTime: 3
   groundCheckDistance: 0.2

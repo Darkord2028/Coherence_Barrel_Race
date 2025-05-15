@@ -2,7 +2,6 @@ using Cinemachine;
 using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviourPun, IPunObservable
 {
@@ -132,7 +131,16 @@ public class Player : MonoBehaviourPun, IPunObservable
     public void SetClient()
     {
         RB.isKinematic = true;
-        playerCollider.enabled = false;
+    }
+
+    public void HandleTurning()
+    {
+        float turn = InputManager.MovementInput.x;
+        float currentSpeed = RB.linearVelocity.magnitude;
+        float speedFactor = Mathf.Clamp01(currentSpeed / playerData.acceleration); // Normalize 0–1
+        float scaledTurnSpeed = playerData.turnSpeed * speedFactor;
+
+        transform.Rotate(Vector3.up, turn * scaledTurnSpeed * Time.fixedDeltaTime);
     }
 
     #endregion

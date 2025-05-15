@@ -43,10 +43,7 @@ public class PlayerGroundedState : PlayerState
         base.LogicUpdate();
 
         isGrounded = player.CheckIfGrounded();
-        MovementInput = player.InputManager.MovementInput;
         AccelerateInput = player.InputManager.AccelerateInput;
-
-        HandleTurning();
 
 
         if (isGrounded)
@@ -73,16 +70,6 @@ public class PlayerGroundedState : PlayerState
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
-    }
-
-    private void HandleTurning()
-    {
-        float turn = player.InputManager.MovementInput.x;
-        float currentSpeed = player.RB.linearVelocity.magnitude;
-        float speedFactor = Mathf.Clamp01(currentSpeed / playerData.acceleration); // Normalize 0–1
-        float scaledTurnSpeed = playerData.turnSpeed * speedFactor;
-
-        player.transform.Rotate(Vector3.up, turn * scaledTurnSpeed * Time.fixedDeltaTime);
     }
 
 }
