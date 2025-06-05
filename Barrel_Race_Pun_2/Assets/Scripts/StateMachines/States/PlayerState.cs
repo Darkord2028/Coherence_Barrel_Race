@@ -56,5 +56,6 @@ public enum E_PlayerState
     ACCELERATION,
     DECELERATION,
     BOOST,
-    INAIR
+    INAIR,
+    FINISH
 }

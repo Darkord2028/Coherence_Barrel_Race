@@ -1,13 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 public class PlayerInputManager : MonoBehaviour
 {
     #region Input Flags
 
     public Vector2 MovementInput { get; private set; }
-    public bool isReadyInput { get; private set; }
     public bool AccelerateInput { get; private set; }
 
     #endregion
@@ -17,6 +15,8 @@ public class PlayerInputManager : MonoBehaviour
     private Vector2 lastTouchPosition;
     private Vector2 currentTouchPosition;
 
+    private PlayerInput playerInput;
+
     #endregion
 
     #region SeializedField Variables
@@ -25,19 +25,20 @@ public class PlayerInputManager : MonoBehaviour
 
     #endregion
 
+    #region Unity CalllBack Methods
+
+    private void Start()
+    {
+        playerInput = GetComponent<PlayerInput>();
+    }
+
+    #endregion
+
     #region Input Actions
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         MovementInput = context.ReadValue<Vector2>();
-    }
-
-    public void OnReadyInput(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            isReadyInput = true;
-        }
     }
 
     public void OnAccelerateInput(InputAction.CallbackContext context)
@@ -79,19 +80,14 @@ public class PlayerInputManager : MonoBehaviour
         }
     }
 
-    public void OnDoubleTap(InputAction.CallbackContext context)
-    {
-        if (context.interaction is MultiTapInteraction && context.performed)
-        {
-            Debug.Log("Double Tap Detected via Interaction!");
-        }
-    }
-
     #endregion
 
-    #region Use Input Methods
+    #region Get Methods
 
-    public void UseReadyInput() => isReadyInput = false;
+    public PlayerInput GetPlayerInput()
+    {
+        return playerInput;
+    }
 
     #endregion
 

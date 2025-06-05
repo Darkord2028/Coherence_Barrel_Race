@@ -60,7 +60,12 @@ public class PlayerAccelerateState : PlayerGroundedState
         boostSpeed = -playerData.mudSpeed;
 
         if (boostSpeed < playerData.acceleration) { boostSpeed = -playerData.acceleration + 5f; }
-        player.StartCoroutine(StopSpeed(playerData.mudSpeedTime));
+        //player.StartCoroutine(StopSpeed(playerData.mudSpeedTime));
+    }
+
+    public void StopMudSpeed()
+    {
+        boostSpeed = 0;
     }
 
     private IEnumerator StopSpeed(float time)

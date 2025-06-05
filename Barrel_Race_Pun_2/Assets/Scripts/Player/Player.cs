@@ -10,6 +10,7 @@ public class Player : MonoBehaviourPun, IPunObservable
     public PlayerIdleState IdleState { get; private set; }
     public PlayerAccelerateState AccelerateState { get; private set; }
     public PlayerDecelerateState DecelerateState { get; private set; }
+    public PlayerFinishState FinishState { get; private set; }
     public PlayerInAirState InAirState { get; private set; }
     private Dictionary<E_PlayerState, PlayerState> StateEnumMap = new();
 
@@ -68,13 +69,14 @@ public class Player : MonoBehaviourPun, IPunObservable
         AccelerateState = new PlayerAccelerateState(this, StateMachine, playerData, "accelerate");
         DecelerateState = new PlayerDecelerateState(this, StateMachine, playerData, "decelerate");
         InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
+        FinishState = new PlayerFinishState(this, StateMachine, playerData, "finish");
 
         //TBD --> should be cleaned afterwards
         StateEnumMap.Add(E_PlayerState.IDLE, IdleState);
         StateEnumMap.Add(E_PlayerState.ACCELERATION, AccelerateState);
         StateEnumMap.Add(E_PlayerState.DECELERATION, DecelerateState);
         StateEnumMap.Add(E_PlayerState.INAIR, InAirState);
-
+        StateEnumMap.Add(E_PlayerState.FINISH, FinishState);
     }
 
     private void Start()
@@ -143,6 +145,11 @@ public class Player : MonoBehaviourPun, IPunObservable
         transform.Rotate(Vector3.up, turn * scaledTurnSpeed * Time.fixedDeltaTime);
     }
 
+    public void SetPlayerRank(int Rank)
+    {
+        GameManager.Instance.GetUIManager().SetRank(Rank, photonView.Owner.NickName);
+    }
+
     #endregion
 
     #region Get Methods
@@ -157,10 +164,6 @@ public class Player : MonoBehaviourPun, IPunObservable
     {
         if (other.TryGetComponent(out Interactable interactable))
         {
-            if (interactable.interactableType == InteractableTypes.Nitro)
-            {
-                AccelerateState.SetBoost();
-            }
             switch (interactable.interactableType)
             {
                 case InteractableTypes.Nitro:
@@ -185,6 +188,27 @@ public class Player : MonoBehaviourPun, IPunObservable
 
                 case InteractableTypes.Checkpoint:
                     spawnPosition = other.transform.position;
+                    break;
+
+                case InteractableTypes.FinishLine:
+                    StateMachine.ChangeState(FinishState);
+                    break;
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out Interactable interactable))
+        {
+            if (interactable.interactableType == InteractableTypes.Nitro)
+            {
+                AccelerateState.SetBoost();
+            }
+            switch (interactable.interactableType)
+            {
+                case InteractableTypes.Mud:
+                    AccelerateState.StopMudSpeed();
                     break;
             }
         }

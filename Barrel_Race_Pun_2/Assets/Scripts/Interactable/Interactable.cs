@@ -11,5 +11,6 @@ public enum InteractableTypes
     Mud,
     Wall,
     Ink,
-    Checkpoint
+    Checkpoint,
+    FinishLine
 }

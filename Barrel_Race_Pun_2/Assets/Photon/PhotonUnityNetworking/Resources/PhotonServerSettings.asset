@@ -40,6 +40,8 @@ MonoBehaviour:
   - SetPlayerReadyListRPC
   - StateUpdateRPC
   - DeclareRank
+  - IncreaseRank
+  - SetRankRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

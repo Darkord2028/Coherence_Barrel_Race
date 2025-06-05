@@ -1,4 +1,3 @@
-using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
@@ -39,13 +38,20 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button reconnectButton;
     [SerializeField] Button createRoomButton;
 
+    [Header("Player Rank")]
+    [SerializeField] GameObject playerRankUI;
+    [SerializeField] Transform playerRankParent;
+
     private int maxPlayers = 6;
 
     #endregion
 
     #region Private Variables
 
-    private string defaultName;
+    private PhotonView photonView;
+
+    private int Rank;
+    private string PlayerName;
 
     #endregion
 
@@ -65,6 +71,8 @@ public class UIManager : MonoBehaviour
     {
         playerName.transform.parent.gameObject.SetActive(false);
         maxPlayersText.text = maxPlayers.ToString();
+
+        photonView = GetComponent<PhotonView>();
     }
 
 
@@ -202,6 +210,21 @@ public class UIManager : MonoBehaviour
     public void SetInfoPanel(string infoMessage)
     {
         infoText.text = infoMessage;
+    }
+
+    public void SetRank(int Rank, string PlayerName)
+    {
+        photonView.RPC(nameof(SetRankRPC), RpcTarget.AllBuffered, Rank, PlayerName);
+        playerRankParent.gameObject.SetActive(true);
+    }
+
+    [PunRPC]
+    private void SetRankRPC(int Rank, string PlayerName)
+    {
+        GameObject WinnerRankUI = Instantiate(playerRankUI);
+        WinnerRankUI.transform.SetParent(playerRankParent);
+        PlayerWinnerDeclaration winnerDeclaration = WinnerRankUI.GetComponent<PlayerWinnerDeclaration>();
+        winnerDeclaration.DeclarePlayerRank(Rank, PlayerName);
     }
 
     #endregion

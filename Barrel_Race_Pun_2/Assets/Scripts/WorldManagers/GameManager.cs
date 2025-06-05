@@ -8,6 +8,8 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
+    public static GameManager Instance { get; private set; }
+
     #region Game States
 
     public GameStateMachine StateMachine { get; private set; }
@@ -57,6 +59,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void Awake()
     {
+        if (Instance == null) {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         StateMachine = new GameStateMachine();
 
         OfflineState = new GameOfflineState(this, StateMachine, gameData);
