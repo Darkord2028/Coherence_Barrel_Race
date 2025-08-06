@@ -52,6 +52,7 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     public PlayerStateMachine StateMachine;
     public PlayerInputManager InputManager { get; private set; }
+    public UIManager UIManager => GameManager.Instance.GetUIManager();
 
     #endregion
 
@@ -147,7 +148,8 @@ public class Player : MonoBehaviourPun, IPunObservable
 
     public void SetPlayerRank(int Rank)
     {
-        GameManager.Instance.GetUIManager().SetRank(Rank, photonView.Owner.NickName);
+        UIManager.SetRank(Rank, photonView.Owner.NickName);
+        Debug.Log($"Player {photonView.Owner.NickName} has rank {Rank}");
     }
 
     #endregion

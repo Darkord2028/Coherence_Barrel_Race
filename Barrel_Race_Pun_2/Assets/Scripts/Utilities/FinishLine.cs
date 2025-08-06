@@ -1,12 +1,13 @@
 using Photon.Pun;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class FinishLine : MonoBehaviour
 {
     public InteractableTypes interactableTypes;
     
     PhotonView photonView;
-    private int currentRank = 0;
+    public int currentRank = 1;
 
     private void Start()
     {
@@ -17,18 +18,28 @@ public class FinishLine : MonoBehaviour
     {
         if (other.TryGetComponent<PhotonView>(out PhotonView photonView))
         {
-            this.photonView.RPC(nameof(IncreaseRank), RpcTarget.All, photonView.ViewID);
-            Player player = other.GetComponent<Player>();
-            if (player != null)
-            {
-                player.SetPlayerRank(currentRank);
-            }
+            this.photonView.RPC(nameof(AssignRankToPlayer), RpcTarget.OthersBuffered, photonView.ViewID);
         }
     }
 
     [PunRPC]
-    private void IncreaseRank(int viewID)
+    private void AssignRankToPlayer(int viewID)
     {
         currentRank++;
+        PhotonView pv = PhotonView.Find(viewID);
+        if (pv != null)
+        {
+            Player player = pv.GetComponent<Player>();
+            PlayerInfoData playerInfo = player.GetComponent<PlayerInfoData>();
+            if (player != null)
+            {
+                player.StateMachine.ChangeState(player.FinishState);
+
+                if (playerInfo != null)
+                {
+                    player.SetPlayerRank(currentRank);
+                }
+            }
+        }
     }
 }

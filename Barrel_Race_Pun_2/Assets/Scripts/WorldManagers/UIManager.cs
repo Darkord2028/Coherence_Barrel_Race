@@ -37,6 +37,7 @@ public class UIManager : MonoBehaviour
     [Header("Button References")]
     [SerializeField] Button reconnectButton;
     [SerializeField] Button createRoomButton;
+    [SerializeField] Button playAgainButton;
 
     [Header("Player Rank")]
     [SerializeField] GameObject playerRankUI;
@@ -49,9 +50,7 @@ public class UIManager : MonoBehaviour
     #region Private Variables
 
     private PhotonView photonView;
-
-    private int Rank;
-    private string PlayerName;
+    private HashSet<string> displayedPlayers = new HashSet<string>();
 
     #endregion
 
@@ -73,6 +72,7 @@ public class UIManager : MonoBehaviour
         maxPlayersText.text = maxPlayers.ToString();
 
         photonView = GetComponent<PhotonView>();
+        playAgainButton.onClick.AddListener(HandleSceneReload);
     }
 
 
@@ -169,13 +169,12 @@ public class UIManager : MonoBehaviour
         ToggleInfoPanel(enable);
         reconnectButton.gameObject.SetActive(enable);
         reconnectButton.onClick.AddListener(HandleSceneReload);
-
     }
 
     private void HandleSceneReload()
     {
-        SceneManager.LoadScene(0);
         reconnectButton.gameObject.SetActive(false);
+        SceneManager.LoadScene(0);
     }
 
     #endregion
@@ -212,19 +211,32 @@ public class UIManager : MonoBehaviour
         infoText.text = infoMessage;
     }
 
-    public void SetRank(int Rank, string PlayerName)
+    public void ShowPlayAgainButton(bool show)
     {
-        photonView.RPC(nameof(SetRankRPC), RpcTarget.AllBuffered, Rank, PlayerName);
+        playAgainButton.gameObject.SetActive(show);
+    }
+
+    public void SetRank(int rank, string playerName)
+    {
+        photonView.RPC(nameof(SetRankRPC), RpcTarget.AllBuffered, rank, playerName);
+        Debug.Log($"Player {playerName} has rank {rank}");
         playerRankParent.gameObject.SetActive(true);
     }
 
     [PunRPC]
-    private void SetRankRPC(int Rank, string PlayerName)
+    private void SetRankRPC(int rank, string playerName)
     {
-        GameObject WinnerRankUI = Instantiate(playerRankUI);
-        WinnerRankUI.transform.SetParent(playerRankParent);
-        PlayerWinnerDeclaration winnerDeclaration = WinnerRankUI.GetComponent<PlayerWinnerDeclaration>();
-        winnerDeclaration.DeclarePlayerRank(Rank, PlayerName);
+        Debug.Log($"Player {playerName} has rank {rank}");
+        if (displayedPlayers.Contains(playerName))
+            return;
+
+        displayedPlayers.Add(playerName);
+
+        GameObject winnerRankUI = Instantiate(playerRankUI);
+        winnerRankUI.transform.SetParent(playerRankParent, false);
+
+        PlayerWinnerDeclaration declaration = winnerRankUI.GetComponent<PlayerWinnerDeclaration>();
+        declaration.DeclarePlayerRank(rank, playerName);
     }
 
     #endregion

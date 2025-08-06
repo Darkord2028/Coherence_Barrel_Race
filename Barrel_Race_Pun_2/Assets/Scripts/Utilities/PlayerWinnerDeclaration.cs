@@ -4,13 +4,13 @@ using UnityEngine;
 public class PlayerWinnerDeclaration : MonoBehaviour
 {
     [Header("UI Items")]
-    [SerializeField] TextMeshProUGUI playerRankText;
     [SerializeField] TextMeshProUGUI playerNameText;
+    [SerializeField] TextMeshProUGUI playerRankText;
 
-    public void DeclarePlayerRank(int Rank, string PlayerName)
+    public void DeclarePlayerRank(int rank, string PlayerName)
     {
-        playerRankText.text = Rank.ToString();
         playerNameText.text = PlayerName;
+        playerRankText.text = rank.ToString();
     }
 
 }

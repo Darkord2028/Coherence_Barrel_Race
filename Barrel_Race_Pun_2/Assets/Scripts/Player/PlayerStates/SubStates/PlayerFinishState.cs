@@ -25,7 +25,12 @@ public class PlayerFinishState : PlayerState
     {
         base.Enter();
         player.RB.linearVelocity = Vector3.zero;
-        player.InputManager.GetPlayerInput().enabled = false;
+
+        if (player.photonView.IsMine)
+        {
+            player.InputManager.GetPlayerInput().enabled = false;
+            player.UIManager.ShowPlayAgainButton(true);
+        }
     }
 
     public override void Exit()

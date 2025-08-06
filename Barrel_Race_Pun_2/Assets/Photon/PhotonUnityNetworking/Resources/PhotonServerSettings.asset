@@ -42,6 +42,7 @@ MonoBehaviour:
   - DeclareRank
   - IncreaseRank
   - SetRankRPC
+  - AssignRankToPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
